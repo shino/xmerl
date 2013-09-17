@@ -1,19 +1,19 @@
 %%
 %% %CopyrightBegin%
-%% 
+%%
 %% Copyright Ericsson AB 2003-2011. All Rights Reserved.
-%% 
+%%
 %% The contents of this file are subject to the Erlang Public License,
 %% Version 1.1, (the "License"); you may not use this file except in
 %% compliance with the License. You should have received a copy of the
 %% Erlang Public License along with this software. If not, it can be
 %% retrieved online at http://www.erlang.org/.
-%% 
+%%
 %% Software distributed under the License is distributed on an "AS IS"
 %% basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See
 %% the License for the specific language governing rights and limitations
 %% under the License.
-%% 
+%%
 %% %CopyrightEnd%
 %%
 
@@ -23,16 +23,16 @@
 -module(xmerl_lib).
 
 -export([normalize_content/1, normalize_content/3, expand_content/1,
-	 expand_content/3, normalize_element/1, normalize_element/3,
-	 expand_element/1, expand_element/3, expand_attributes/1,
-	 expand_attributes/3, export_text/1, flatten_text/1,
-	 export_attribute/1, markup/2, markup/3, simplify_element/1,
-	 simplify_content/1, start_tag/1, start_tag/2, end_tag/1,
-	 empty_tag/1, empty_tag/2,is_empty_data/1, find_attribute/2,
-	 remove_whitespace/1,to_lower/1]).
+         expand_content/3, normalize_element/1, normalize_element/3,
+         expand_element/1, expand_element/3, expand_attributes/1,
+         expand_attributes/3, export_text/1, flatten_text/1,
+         export_attribute/1, markup/2, markup/3, simplify_element/1,
+         simplify_content/1, start_tag/1, start_tag/2, end_tag/1,
+         empty_tag/1, empty_tag/2,is_empty_data/1, find_attribute/2,
+         remove_whitespace/1,to_lower/1]).
 
 -export([is_letter/1,is_namechar/1,is_ncname/1,
-	 detect_charset/1,detect_charset/2,is_name/1,is_char/1]).
+         detect_charset/1,detect_charset/2,is_name/1,is_char/1]).
 
 
 -export([mapxml/2, foldxml/3, mapfoldxml/3]).
@@ -153,48 +153,64 @@ expand_element(E = #xmlElement{name = N}, Pos, Parents, Norm) ->
     Content = expand_content(E#xmlElement.content, 1, NewParents, Norm),
     Attrs = expand_attributes(E#xmlElement.attributes, 1, NewParents),
     E#xmlElement{pos = Pos,
-		 parents = Parents,
-		 attributes = Attrs,
-		 content = Content};
+                 parents = Parents,
+                 attributes = Attrs,
+                 content = Content};
 expand_element(E = #xmlText{}, Pos, Parents, Norm) ->
     E#xmlText{pos = Pos,
-	      parents = Parents,
-	      value = expand_text(E#xmlText.value, Norm)};
+              parents = Parents,
+              value = expand_text(E#xmlText.value, Norm)};
 expand_element(E = #xmlPI{}, Pos, Parents, Norm) ->
     E#xmlPI{pos = Pos,
-	    parents = Parents,
-	    value = expand_text(E#xmlPI.value, Norm)};
+            parents = Parents,
+            value = expand_text(E#xmlPI.value, Norm)};
 expand_element(E = #xmlComment{}, Pos, Parents, Norm) ->
     E#xmlComment{pos = Pos,
-		 parents = Parents,
-		 value = expand_text(E#xmlComment.value, Norm)};
+                 parents = Parents,
+                 value = expand_text(E#xmlComment.value, Norm)};
 expand_element(E = #xmlDecl{}, _Pos, _Parents, _Norm) ->
     Attrs = expand_attributes(E#xmlDecl.attributes, 1, []),
     E#xmlDecl{attributes = Attrs};
+expand_element({{Tag, Name}, Attrs, Content}, Pos, Parents, Norm) when is_atom(Tag) ->
+    NewParents = [{Name, Pos} | Parents],
+    #xmlElement{name = Name,
+                tag = Tag,
+                pos = Pos,
+                parents = Parents,
+                attributes = expand_attributes(Attrs, 1, NewParents),
+                content = expand_content(Content, 1, NewParents, Norm)};
 expand_element({Tag, Attrs, Content}, Pos, Parents, Norm) when is_atom(Tag) ->
     NewParents = [{Tag, Pos} | Parents],
     #xmlElement{name = Tag,
-		pos = Pos,
-		parents = Parents,
-		attributes = expand_attributes(Attrs, 1, NewParents),
-		content = expand_content(Content, 1, NewParents, Norm)};
+                pos = Pos,
+                parents = Parents,
+                attributes = expand_attributes(Attrs, 1, NewParents),
+                content = expand_content(Content, 1, NewParents, Norm)};
+expand_element({{Tag, Name}, Content}, Pos, Parents, Norm) when is_atom(Tag) ->
+    NewParents = [{Name, Pos} | Parents],
+    #xmlElement{name = Name,
+                tag = Tag,
+                pos = Pos,
+                parents = Parents,
+                attributes = [],
+                content = expand_content(Content, 1, NewParents, Norm)};
 expand_element({Tag, Content}, Pos, Parents, Norm) when is_atom(Tag) ->
     NewParents = [{Tag, Pos} | Parents],
     #xmlElement{name = Tag,
-		pos = Pos,
-		parents = Parents,
-		attributes = [],
-		content = expand_content(Content, 1, NewParents, Norm)};
+                pos = Pos,
+                parents = Parents,
+                attributes = [],
+                content = expand_content(Content, 1, NewParents, Norm)};
 expand_element(Tag, Pos, Parents, _Norm) when is_atom(Tag) ->
     #xmlElement{name = Tag,
-		pos = Pos,
-		parents = Parents,
-		attributes = [],
-		content = []};
+                pos = Pos,
+                parents = Parents,
+                attributes = [],
+                content = []};
 expand_element(String, Pos, Parents, Norm) when is_list(String) ->
     #xmlText{pos = Pos,
-	     parents = Parents,
-	     value = expand_text(String, Norm)}.
+             parents = Parents,
+             value = expand_text(String, Norm)}.
 
 expand_text(S, false) -> S;
 expand_text(S, true) -> flatten_text(S).
@@ -217,8 +233,8 @@ expand_content([{H} | T], Pos, Parents, Norm) ->
     expand_content(H ++ T, Pos, Parents, Norm);
 expand_content([{F,S}|T], Pos, Parents, Norm) when is_function(F) ->
     case F(S) of
-	done -> expand_content(T, Pos, Parents, Norm);
-	{C,S2} -> expand_content([{F,S2},C|T], Pos, Parents, Norm)
+        done -> expand_content(T, Pos, Parents, Norm);
+        {C,S2} -> expand_content([{F,S2},C|T], Pos, Parents, Norm)
     end;
 expand_content([H | T], Pos, Parents, Norm) ->
     [expand_element(H, Pos, Parents, Norm)
@@ -233,20 +249,20 @@ expand_attributes(Attrs) ->
 
 expand_attributes([H = #xmlAttribute{} | T], Pos, Parents) ->
     [H#xmlAttribute{pos = Pos,
-		    value = expand_value(H#xmlAttribute.value)}
+                    value = expand_value(H#xmlAttribute.value)}
      | expand_attributes(T, Pos+1, Parents)];
-expand_attributes([{P,S}|T], Pos, Parents) when is_function(P) -> 
+expand_attributes([{P,S}|T], Pos, Parents) when is_function(P) ->
     case P(S) of
-	done ->
-	    expand_attributes(T, Pos, Parents);
-	{A,S2} ->
-	    expand_attributes([{P,S2},A|T], Pos, Parents)
+        done ->
+            expand_attributes(T, Pos, Parents);
+        {A,S2} ->
+            expand_attributes([{P,S2},A|T], Pos, Parents)
     end;
 expand_attributes([{K, V} | T], Pos, Parents) ->
     [#xmlAttribute{name = K,
-		   pos = Pos,
-		   parents = Parents,
-		   value = expand_value(V)}
+                   pos = Pos,
+                   parents = Parents,
+                   value = expand_value(V)}
      | expand_attributes(T, Pos+1, Parents)];
 expand_attributes([], _Pos, _Parents) ->
     [].
@@ -264,10 +280,10 @@ expand_value(S) ->
 %% strings. Text elements are not flattened.
 
 simplify_element(#xmlElement{expanded_name = [], name = Tag,
-			     attributes = Attrs, content = Content}) ->
+                             attributes = Attrs, content = Content}) ->
     {Tag, simplify_attributes(Attrs), simplify_content(Content)};
 simplify_element(#xmlElement{expanded_name = Name,
-			     attributes = Attrs, content = Content}) ->
+                             attributes = Attrs, content = Content}) ->
     {Name, simplify_attributes(Attrs), simplify_content(Content)};
 simplify_element(#xmlText{value = Text}) ->
     Text;
@@ -303,10 +319,10 @@ simplify_attributes([]) ->
 
 find_attribute(Name, Attrs) ->
     case lists:keysearch(Name, #xmlAttribute.name, Attrs) of
-	{value, #xmlAttribute{value = V}} ->
-	    {value, V};
-	false ->
-	    false
+        {value, #xmlAttribute{value = V}} ->
+            {value, V};
+        false ->
+            false
     end.
 
 
@@ -353,10 +369,10 @@ is_empty_data([]) ->
     true;
 is_empty_data([X | Xs]) ->
     case is_empty_data(X) of
-	false ->
-	    false;
-	true ->
-	    is_empty_data(Xs)
+        false ->
+            false;
+        true ->
+            is_empty_data(Xs)
     end;
 is_empty_data(_) ->
     false.
@@ -433,20 +449,20 @@ detect_charset(Content) ->
 %%%  </table>
 %%%   ExtCharset is any externally declared character set (e.g. in HTTP
 %%%   Content-Type header) and Content is an XML Document.
-%%% 
+%%%
 detect_charset(ExtCharset,Content) when is_list(ExtCharset) ->
     %% FIXME! Don't allow both atom and list for character set names
     detect_charset(list_to_atom(ExtCharset),Content);
 detect_charset(ExtCharset,Content) ->
     case autodetect(ExtCharset,Content) of
-	{auto,Content1} ->
-	    {auto,'iso-10646-utf-1',Content1};
-	{external,Content1} ->
-	    {external,'iso-10646-utf-1',Content1};
-	{undefined,_} ->
-	    {undefined,undefined,Content};
-	{ExtCharset, Content} ->
-	    {external,ExtCharset,Content}
+        {auto,Content1} ->
+            {auto,'iso-10646-utf-1',Content1};
+        {external,Content1} ->
+            {external,'iso-10646-utf-1',Content1};
+        {undefined,_} ->
+            {undefined,undefined,Content};
+        {ExtCharset, Content} ->
+            {external,ExtCharset,Content}
     end.
 
 %%------------------------------------------------------------------------------
@@ -521,9 +537,9 @@ is_ncname([$_|T]) ->
     is_name1(T);
 is_ncname([H|T]) ->
     case is_letter(H) of
-	true ->
-	    is_name1(T);
-	_ -> false
+        true ->
+            is_name1(T);
+        _ -> false
     end.
 
 is_name(A) when is_atom(A) ->
@@ -534,22 +550,22 @@ is_name([$:|T]) ->
     is_name1(T);
 is_name([H|T]) ->
     case is_letter(H) of
-	true ->
-	    is_name1(T);
-	_ -> false
+        true ->
+            is_name1(T);
+        _ -> false
     end.
 
 is_name1([]) ->
     true;
 is_name1([H|T]) ->
     case is_namechar(H) of
-	true ->
-	    is_name1(T);
-	_ -> false
+        true ->
+            is_name1(T);
+        _ -> false
     end.
 
 
-				
+
 % =======
 %%% UNICODE character definitions
 
@@ -563,8 +579,8 @@ is_char(X) when X >= 16#E000, X =< 16#FFFD -> true;
 is_char(X) when X >= 16#10000, X =< 16#10FFFF -> true;
 is_char(_) -> false.
 
-%% 0 - not classified, 
-%% 1 - base_char or ideographic, 
+%% 0 - not classified,
+%% 1 - base_char or ideographic,
 %% 2 - combining_char or digit or extender,
 %% 3 - $. or $- or $_ or $:
 -define(SMALL, {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -599,12 +615,12 @@ is_namechar(X) ->
 %% [84] Letter
 is_letter(X) ->
     try element(X, ?SMALL) =:= 1
-    catch _:_ -> 
+    catch _:_ ->
         case is_base_char(X) of
-	    false ->
-	        is_ideographic(X);
-    	    true ->
-	        true
+            false ->
+                is_ideographic(X);
+            true ->
+                true
         end
     end.
 
@@ -975,7 +991,7 @@ is_facet(minExclusive) -> true;
 is_facet(totalDigits) -> true;
 is_facet(fractionDigits) -> true;
 is_facet(_) -> false.
-    
+
 
 is_builtin_simple_type({Type,_,?XSD_NAMESPACE}) when is_atom(Type) ->
     is_builtin_simple_type(atom_to_list(Type));

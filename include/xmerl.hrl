@@ -1,19 +1,19 @@
-%% 
+%%
 %% %CopyrightBegin%
-%% 
+%%
 %% Copyright Ericsson AB 2004-2011. All Rights Reserved.
-%% 
+%%
 %% The contents of this file are subject to the Erlang Public License,
 %% Version 1.1, (the "License"); you may not use this file except in
 %% compliance with the License. You should have received a copy of the
 %% Erlang Public License along with this software. If not, it can be
 %% retrieved online at http://www.erlang.org/.
-%% 
+%%
 %% Software distributed under the License is distributed on an "AS IS"
 %% basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See
 %% the License for the specific language governing rights and limitations
 %% under the License.
-%% 
+%%
 %% %CopyrightEnd%
 %%
 %% Contributor(s):
@@ -35,159 +35,160 @@
 
 %% XML declaration
 -record(xmlDecl,{
-	  vsn,        % string() XML version
-	  encoding,   % string() Character encoding 
-	  standalone, % (yes | no)
-	  attributes  % [#xmlAttribute()] Other attributes than above
-	 }).
+          vsn,        % string() XML version
+          encoding,   % string() Character encoding
+          standalone, % (yes | no)
+          attributes  % [#xmlAttribute()] Other attributes than above
+         }).
 
 %% Attribute
 -record(xmlAttribute,{
-	  name,		   % atom()
-	  expanded_name=[],% atom() | {string(),atom()}
-	  nsinfo = [],	   % {Prefix, Local} | []
-	  namespace = [],  % inherits the element's namespace
-	  parents = [],	   % [{atom(),integer()}]
-	  pos,		   % integer()
-	  language = [],   % inherits the element's language
-	  value,	   % IOlist() | atom() | integer()
-	  normalized       % atom() one of (true | false)
-	 }).
+          name,            % atom()
+          expanded_name=[],% atom() | {string(),atom()}
+          nsinfo = [],     % {Prefix, Local} | []
+          namespace = [],  % inherits the element's namespace
+          parents = [],    % [{atom(),integer()}]
+          pos,             % integer()
+          language = [],   % inherits the element's language
+          value,           % IOlist() | atom() | integer()
+          normalized       % atom() one of (true | false)
+         }).
 
 %% namespace record
 -record(xmlNamespace,{
-	  default = [],
-	  nodes = []
-	 }).
+          default = [],
+          nodes = []
+         }).
 
 %% namespace node - i.e. a {Prefix, URI} pair
 -record(xmlNsNode,{
-	  parents = [],	% [{atom(),integer()}]
-	  pos,		% integer()
-	  prefix,	% string()
-	  uri = []	% [] | atom()
-	 }).
+          parents = [], % [{atom(),integer()}]
+          pos,          % integer()
+          prefix,       % string()
+          uri = []      % [] | atom()
+         }).
 
 %% XML Element
 %% content = [#xmlElement()|#xmlText()|#xmlPI()|#xmlComment()|#xmlDecl()]
 -record(xmlElement,{
-	  name,			% atom()
-	  expanded_name = [],	% string() | {URI,Local} | {"xmlns",Local}
-	  nsinfo = [],	        % {Prefix, Local} | []
-	  namespace=#xmlNamespace{},
-	  parents = [],		% [{atom(),integer()}]
-	  pos,			% integer()
-	  attributes = [],	% [#xmlAttribute()]
-	  content = [],
-	  language = "",	% string()
-	  xmlbase="",           % string() XML Base path, for relative URI:s
-	  elementdef=undeclared % atom(), one of [undeclared | prolog | external | element]
-	 }).
+          name,                 % atom()
+          tag,                  % atom()
+          expanded_name = [],   % string() | {URI,Local} | {"xmlns",Local}
+          nsinfo = [],          % {Prefix, Local} | []
+          namespace=#xmlNamespace{},
+          parents = [],         % [{atom(),integer()}]
+          pos,                  % integer()
+          attributes = [],      % [#xmlAttribute()]
+          content = [],
+          language = "",        % string()
+          xmlbase="",           % string() XML Base path, for relative URI:s
+          elementdef=undeclared % atom(), one of [undeclared | prolog | external | element]
+         }).
 
 %% plain text
 %% IOlist = [char() | binary () | IOlist]
 -record(xmlText,{
-	  parents = [],	% [{atom(),integer()}]
-	  pos,		% integer()
-	  language = [],% inherits the element's language
-	  value,	% IOlist()
-	  type = text   % atom() one of (text|cdata)
-	 }).
+          parents = [], % [{atom(),integer()}]
+          pos,          % integer()
+          language = [],% inherits the element's language
+          value,        % IOlist()
+          type = text   % atom() one of (text|cdata)
+         }).
 
 %% plain text
 -record(xmlComment,{
-	  parents = [],  % [{atom(),integer()}]
-	  pos,	         % integer()
-	  language = [], % inherits the element's language
-	  value	         % IOlist()
-	 }).
+          parents = [],  % [{atom(),integer()}]
+          pos,           % integer()
+          language = [], % inherits the element's language
+          value          % IOlist()
+         }).
 
 %% processing instruction
 -record(xmlPI,{
-	  name,		% atom()
-	  parents = [],	% [{atom(),integer()}]
-	  pos,		% integer()
-	  value		% IOlist()
-	 }).
+          name,         % atom()
+          parents = [], % [{atom(),integer()}]
+          pos,          % integer()
+          value         % IOlist()
+         }).
 
 -record(xmlDocument,{
-	  content
-	 }).
+          content
+         }).
 
 
 %% XPATH (xmerl_xpath, xmerl_pred_funcs) records
 
 -record(xmlContext, {
-		     axis_type = forward,
-		     context_node,
-		     context_position = 1,
-		     nodeset = [],
-		     bindings = [],
-		     functions = [],
-		     namespace = [],
-		     whole_document
-		    }).
+                     axis_type = forward,
+                     context_node,
+                     context_position = 1,
+                     nodeset = [],
+                     bindings = [],
+                     functions = [],
+                     namespace = [],
+                     whole_document
+                    }).
 
 -record(xmlNode, {
-		  type = element,
-		  node,
-		  parents = [],
-		  pos = 1
-		 }).
+                  type = element,
+                  node,
+                  parents = [],
+                  pos = 1
+                 }).
 
 -record(xmlObj, {
-		 type,
-		 value
-		 }).
+                 type,
+                 value
+                 }).
 
 -record(xmerl_fun_states, {event,
-			   hook,
-			   rules,
-			   fetch,
-			   cont}).
+                           hook,
+                           rules,
+                           fetch,
+                           cont}).
 
 
 %% scanner state record
 -record(xmerl_scanner,{
-	  encoding=undefined, % undefined | string() Character set used, default is UTF-8
-	  standalone = no,
-%	  prolog =continue,
-	  environment = prolog,    % atom(), (prolog | element)
-	  declarations = [],	   % [{Name, Attrs}]
-	  doctype_name,
-	  doctype_DTD = internal, % internal | DTDId
-	  comments = true,
-	  document = false,
-	  default_attrs = false,
-	  rules,
-	  keep_rules = false,	% delete (ets) tab if false
-	  namespace_conformant = false, % true | false
-	  xmlbase,          % string() Current Base path, for relative URI:s
-	  xmlbase_cache,    % string() Cached Base path
-	  fetch_path=[], % [string()] List with additional, user
+          encoding=undefined, % undefined | string() Character set used, default is UTF-8
+          standalone = no,
+%         prolog =continue,
+          environment = prolog,    % atom(), (prolog | element)
+          declarations = [],       % [{Name, Attrs}]
+          doctype_name,
+          doctype_DTD = internal, % internal | DTDId
+          comments = true,
+          document = false,
+          default_attrs = false,
+          rules,
+          keep_rules = false,   % delete (ets) tab if false
+          namespace_conformant = false, % true | false
+          xmlbase,          % string() Current Base path, for relative URI:s
+          xmlbase_cache,    % string() Cached Base path
+          fetch_path=[], % [string()] List with additional, user
                          % defined, paths
-	  filename=file_name_unknown,
-	  validation = off, %% off (default) | dtd | schema (true, false are obsolete)
-	  schemaLocation = [],
-	  space = preserve,
-	  event_fun,
-	  hook_fun,
-	  acc_fun,
-	  fetch_fun,
-	  close_fun,
-	  continuation_fun,
-	  rules_read_fun,
-	  rules_write_fun,
-	  rules_delete_fun,
-	  user_state,
-	  fun_states = #xmerl_fun_states{},
-	  entity_references=[],
-	  text_decl=false,
-	  quiet=false,   % bool() Set to true will print no error messages
-	  col = 1,
-	  line = 1,
+          filename=file_name_unknown,
+          validation = off, %% off (default) | dtd | schema (true, false are obsolete)
+          schemaLocation = [],
+          space = preserve,
+          event_fun,
+          hook_fun,
+          acc_fun,
+          fetch_fun,
+          close_fun,
+          continuation_fun,
+          rules_read_fun,
+          rules_write_fun,
+          rules_delete_fun,
+          user_state,
+          fun_states = #xmerl_fun_states{},
+          entity_references=[],
+          text_decl=false,
+          quiet=false,   % bool() Set to true will print no error messages
+          col = 1,
+          line = 1,
           common_data = []
-	 }).
+         }).
 
 
 
@@ -196,12 +197,12 @@
 
 %% event : start | end
 -record(xmerl_event, {
-		      event,
-		      line,
-		      col,
-		      pos,
-		      data
-		     }).
+                      event,
+                      line,
+                      col,
+                      pos,
+                      data
+                     }).
 
 
 
@@ -236,6 +237,6 @@
 -define(condstrip3,  {_, T3,  S3}  = condstrip(T2,S2,false)).
 -define(condstrip4,  {_, T4,  S4}  = condstrip(T3,S3,false)).
 
--define(bump_col(N), 
-	?dbg("bump_col(~p), US = ~p~n", [N, S0#xmerl_scanner.user_state]),
-	S = S0#xmerl_scanner{col = S0#xmerl_scanner.col + N}).
+-define(bump_col(N),
+        ?dbg("bump_col(~p), US = ~p~n", [N, S0#xmerl_scanner.user_state]),
+        S = S0#xmerl_scanner{col = S0#xmerl_scanner.col + N}).

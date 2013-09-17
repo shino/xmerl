@@ -1,25 +1,25 @@
 %%
 %% %CopyrightBegin%
-%% 
+%%
 %% Copyright Ericsson AB 2003-2011. All Rights Reserved.
-%% 
+%%
 %% The contents of this file are subject to the Erlang Public License,
 %% Version 1.1, (the "License"); you may not use this file except in
 %% compliance with the License. You should have received a copy of the
 %% Erlang Public License along with this software. If not, it can be
 %% retrieved online at http://www.erlang.org/.
-%% 
+%%
 %% Software distributed under the License is distributed on an "AS IS"
 %% basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See
 %% the License for the specific language governing rights and limitations
 %% under the License.
-%% 
+%%
 %% %CopyrightEnd%
 %%
 
 %%
 %% Description  : Functions to export simple and complete XML forms
-%% 
+%%
 
 %% @doc Functions for exporting XML data to an external format.
 %%
@@ -28,16 +28,16 @@
 
 %-compile(export_all).
 
--export([export/2, 
-	 export/3,
-	 export_content/2,
-	 export_element/2,
-	 export_element/3,
-	 export_simple/2,
-	 export_simple/3,
-	 export_simple_element/2,
-	 export_simple_content/2,
-	 callbacks/1]).
+-export([export/2,
+         export/3,
+         export_content/2,
+         export_element/2,
+         export_element/3,
+         export_simple/2,
+         export_simple/3,
+         export_simple_element/2,
+         export_simple_content/2,
+         callbacks/1]).
 
 -include("xmerl.hrl").
 
@@ -49,18 +49,18 @@ export(Content, Callback) ->
     export(Content, Callback, []).
 
 %% @spec export(Content, Callback, RootAttributes) -> ExportedFormat
-%%	Content = [Element]
-%%	Callback = atom()
+%%      Content = [Element]
+%%      Callback = atom()
 %%      RootAttributes = [XmlAttributes]
 %% @doc Exports normal, well-formed XML content, using the specified
 %% callback-module.
 %% <p><code>Element</code> is any of:</p>
 %% <ul>
-%% 	<li><code>#xmlText{}</code></li>
-%%	<li><code>#xmlElement{}</code></li>
-%%	<li><code>#xmlPI{}</code></li>
-%%	<li><code>#xmlComment{}</code></li>
-%%	<li><code>#xmlDecl{}</code></li>
+%%      <li><code>#xmlText{}</code></li>
+%%      <li><code>#xmlElement{}</code></li>
+%%      <li><code>#xmlPI{}</code></li>
+%%      <li><code>#xmlComment{}</code></li>
+%%      <li><code>#xmlDecl{}</code></li>
 %% </ul>
 %% <p>(See <tt>xmerl.hrl</tt> for the record definitions.)
 %% Text in <code>#xmlText{}</code> elements can be deep lists of
@@ -111,29 +111,29 @@ export_simple(Content, Callback) ->
     export_simple(Content, Callback, []).
 
 %% @spec export_simple(Content, Callback, RootAttributes) -> ExportedFormat
-%%	Content = [Element]
-%%	Callback = atom()
+%%      Content = [Element]
+%%      Callback = atom()
 %%      RootAttributes = [XmlAttributes]
 %% @doc Exports "simple-form" XML content, using the specified
 %% callback-module.
 %% <p><code>Element</code> is any of:</p>
 %% <ul>
-%%	<li><code>{Tag, Attributes, Content}</code></li>
-%%	<li><code>{Tag, Content}</code></li>
-%%	<li><code>Tag</code></li>
-%%	<li><code>IOString</code></li>
-%% 	<li><code>#xmlText{}</code></li>
-%%	<li><code>#xmlElement{}</code></li>
-%%	<li><code>#xmlPI{}</code></li>
-%%	<li><code>#xmlComment{}</code></li>
-%%	<li><code>#xmlDecl{}</code></li>
+%%      <li><code>{Tag, Attributes, Content}</code></li>
+%%      <li><code>{Tag, Content}</code></li>
+%%      <li><code>Tag</code></li>
+%%      <li><code>IOString</code></li>
+%%      <li><code>#xmlText{}</code></li>
+%%      <li><code>#xmlElement{}</code></li>
+%%      <li><code>#xmlPI{}</code></li>
+%%      <li><code>#xmlComment{}</code></li>
+%%      <li><code>#xmlDecl{}</code></li>
 %% </ul>
 %% <p>where</p>
 %% <ul>
-%%	<li><code>Tag = atom()</code></li>
-%%	<li><code>Attributes = [{Name, Value}]</code></li>
-%%	<li><code>Name = atom()</code></li>
-%%	<li><code>Value = IOString | atom() | integer()</code></li>
+%%      <li><code>Tag = atom()</code></li>
+%%      <li><code>Attributes = [{Name, Value}]</code></li>
+%%      <li><code>Name = atom()</code></li>
+%%      <li><code>Value = IOString | atom() | integer()</code></li>
 %% </ul>
 %% <p>Normal-form XML elements can thus be included in the simple-form
 %% representation. Note that content lists must be flat. An
@@ -142,7 +142,7 @@ export_simple(Content, Callback) ->
 %%
 %% <p><code>RootAttributes</code> is a list of:</p>
 %% <ul>
-%%	<li><code>XmlAttributes = #xmlAttribute{}</code></li>
+%%      <li><code>XmlAttributes = #xmlAttribute{}</code></li>
 %%</ul>
 %%
 %% <p>See <code>export/3</code> for details on the callback module and
@@ -166,9 +166,9 @@ export1(Content, Callbacks, RootAttrs) when is_list(Content) ->
     Result = export_content(Content, Callbacks),
     Attrs = xmerl_lib:expand_attributes(RootAttrs, 1, [{'#root#',1}]),
     Root = #xmlElement{name = '#root#',
-		       pos = 1,
-		       parents = [],
-		       attributes = Attrs},
+                       pos = 1,
+                       parents = [],
+                       attributes = Attrs},
     Args = [Result, Root#xmlElement.attributes, [], Root],
     tagdef('#root#',1,[],Args,Callbacks).
 
@@ -176,14 +176,14 @@ export1(Content, Callbacks, RootAttrs) when is_list(Content) ->
 
 export_simple_content(Content, Callback) when is_atom(Callback) ->
     export_content(xmerl_lib:expand_content(Content),
-		   callbacks(Callback));
+                   callbacks(Callback));
 export_simple_content(Content, Callbacks) when is_list(Callbacks) ->
     export_content(xmerl_lib:expand_content(Content), Callbacks).
 
 
 %% @spec export_content(Content, Callbacks) -> term()
-%%	Content = [Element]
-%%	Callback = [atom()]
+%%      Content = [Element]
+%%      Callback = [atom()]
 %% @doc Exports normal XML content directly, without further context.
 export_content([#xmlText{value = Text} | Es], Callbacks) ->
     [apply_text_cb(Callbacks, Text) | export_content(Es, Callbacks)];
@@ -202,7 +202,7 @@ export_content([], _Callbacks) ->
 
 export_simple_element(Content, Callback) when is_atom(Callback) ->
     export_element(xmerl_lib:expand_element(Content),
-		   callbacks(Callback));
+                   callbacks(Callback));
 export_simple_element(Content, Callbacks) when is_list(Callbacks) ->
     export_element(xmerl_lib:expand_element(Content), Callbacks).
 
@@ -215,12 +215,22 @@ export_element(E, CB) when is_atom(CB) ->
 export_element(#xmlText{value = Text}, CBs) ->
     apply_text_cb(CBs, Text);
 export_element(E = #xmlElement{name = Tag,
-			       pos = Pos,
-			       attributes = Attributes,
-			       parents = Parents,
-			       content = Content}, CBs) ->
+                               tag = undefined,
+                               pos = Pos,
+                               attributes = Attributes,
+                               parents = Parents,
+                               content = Content}, CBs) ->
     Data = export_content(Content, CBs),
     Args = [Data, Attributes, Parents, E],
+    tagdef(Tag,Pos,Parents,Args,CBs);
+export_element(E = #xmlElement{name=Name,
+                               tag = Tag,
+                               pos = Pos,
+                               attributes = Attributes,
+                               parents = Parents,
+                               content = Content}, CBs) ->
+    Data = export_content(Content, CBs),
+    Args = [Name, Data, Attributes, Parents, E],
     tagdef(Tag,Pos,Parents,Args,CBs);
 export_element(#xmlPI{}, _CBs) ->
     [];
@@ -232,19 +242,28 @@ export_element(#xmlDecl{}, _CBs) ->
 
 %% @spec export_element(E,CallbackModule,CallbackState) -> ExportedFormat
 %% @doc For on-the-fly exporting during parsing (SAX style) of the XML
-%% document. 
+%% document.
 export_element(E, CallbackModule, CallbackState) when is_atom(CallbackModule) ->
     export_element(E, callbacks(CallbackModule), CallbackState);
 export_element(#xmlText{value = Text},CallbackModule,_CallbackState) ->
 %%    apply_cb(CallbackModule, '#text#', '#text#', [Text,CallbackState]);
     apply_text_cb(CallbackModule,Text);
 export_element(E=#xmlElement{name = Tag,
-			   pos = Pos,
-			   parents = Parents,
-			   attributes = Attributes,
-			   content = Content},Callbacks,CBstate) ->
+                             tag = undefined,
+                           pos = Pos,
+                           parents = Parents,
+                           attributes = Attributes,
+                           content = Content},Callbacks,CBstate) ->
     Args = [Content, Attributes,CBstate,E],
     tagdef(Tag,Pos,Parents,Args,Callbacks);
+export_element(E=#xmlElement{name = Name,
+                             tag = Tag,
+                           pos = Pos,
+                           parents = Parents,
+                           attributes = Attributes,
+                           content = Content},Callbacks,CBstate) ->
+    Args = [Name, Content, Attributes,CBstate,E],
+    tagdef(Tag,Pos,Parents, Args,Callbacks);
 export_element(#xmlPI{}, _CallbackModule, CallbackState) ->
     CallbackState;
 export_element(#xmlComment{},_CallbackModule, CallbackState) ->
@@ -257,18 +276,18 @@ export_element(#xmlDecl{},_CallbackModule, CallbackState) ->
 
 tagdef(Tag,Pos,Parents,Args,CBs) ->
     case apply_tag_cb(CBs, Tag, Args) of
-	{'#xml-alias#', NewTag} ->
-	    tagdef(NewTag,Pos,Parents,Args,CBs);
-	{'#xml-redefine#', Data} ->
-	    export_content(xmerl_lib:expand_content(Data, Pos, Parents),
-			   CBs);
-	Other ->
-	    Other
+        {'#xml-alias#', NewTag} ->
+            tagdef(NewTag,Pos,Parents,Args,CBs);
+        {'#xml-redefine#', Data} ->
+            export_content(xmerl_lib:expand_content(Data, Pos, Parents),
+                           CBs);
+        Other ->
+            Other
     end.
 
 %% @spec callbacks(Module) -> Result
-%%	Module = atom()
-%%	Result = [atom()]
+%%      Module = atom()
+%%      Result = [atom()]
 %% @doc Find the list of inherited callback modules for a given module.
 
 callbacks(Module) ->
@@ -278,11 +297,11 @@ callbacks(Module) ->
 
 callbacks([M|Mods], Visited) ->
     case lists:member(M, Visited) of
-	false ->
-	    NewVisited = check_inheritance(M, Visited),
-	    callbacks(Mods, NewVisited);
-	true ->
-	    exit({cyclic_inheritance, {M, hd(Visited)}})
+        false ->
+            NewVisited = check_inheritance(M, Visited),
+            callbacks(Mods, NewVisited);
+        true ->
+            exit({cyclic_inheritance, {M, hd(Visited)}})
     end;
 callbacks([], Visited) ->
     Visited.
@@ -290,10 +309,10 @@ callbacks([], Visited) ->
 check_inheritance(M, Visited) ->
 %%%     io:format("calling ~p:'#xml-inheritance#'()~n", [M]),
     case M:'#xml-inheritance#'() of
-	[] ->
-	    [M|Visited];
-	Mods ->
-	    callbacks(Mods, [M|Visited])
+        [] ->
+            [M|Visited];
+        Mods ->
+            callbacks(Mods, [M|Visited])
     end.
 
 apply_text_cb(Ms, Text) ->
@@ -307,12 +326,12 @@ apply_cb(Ms, F, Df, Args) ->
 
 apply_cb([M|Ms], F, Df, Args, Ms0) ->
     case catch apply(M, F, Args) of
-	{'EXIT', {undef,[{M,F,_,_}|_]}} ->
-	    apply_cb(Ms, F, Df, Args, Ms0);
-	{'EXIT', Reason} ->
-	    exit(Reason);
-	Res ->
-	    Res
+        {'EXIT', {undef,[{M,F,_,_}|_]}} ->
+            apply_cb(Ms, F, Df, Args, Ms0);
+        {'EXIT', Reason} ->
+            exit(Reason);
+        Res ->
+            Res
     end;
 apply_cb([], Df, Df, Args, _Ms0) ->
     exit({unknown_tag, {Df, Args}});

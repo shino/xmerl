@@ -3,3 +3,5 @@ deps/*
 ebin/*.beam
 ebin/*.app
 ebin/*.appup
+src/xmerl_b64Bin.erl
+src/xmerl_xpath_parse.erl
